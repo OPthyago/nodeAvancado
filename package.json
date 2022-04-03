@@ -10,7 +10,8 @@
     "test:coverage": "npm test -- --coverage",
     "build": "rimraf dist && tsc -p tsconfig-build.json",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
+    "husky": "^7.0.4",
     "jest": "^27.5.1",
     "lint-staged": "^12.3.7",
     "ts-jest": "^27.1.4",
