@@ -1,1 +1,1 @@
-import {} from "./config/module-alias"
+import {} from './config/module-alias'
