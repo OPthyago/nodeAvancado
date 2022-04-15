@@ -72,4 +72,19 @@ describe('FacebookauthenticationService', () => {
     })
     expect(userAccountRepository.updadeWithFacebook).toHaveBeenCalledTimes(1)
   })
+
+  it('should update account name', async () => {
+    userAccountRepository.load.mockResolvedValueOnce({
+      id: 'any_id'
+    })
+
+    await sut.perform({ token })
+
+    expect(userAccountRepository.updadeWithFacebook).toHaveBeenCalledWith({
+      id: 'any_id',
+      name: 'any_facebook_name',
+      facebookId: 'any_facebook_id'
+    })
+    expect(userAccountRepository.updadeWithFacebook).toHaveBeenCalledTimes(1)
+  })
 })
