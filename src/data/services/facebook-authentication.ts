@@ -5,18 +5,17 @@ import { LoadUserAccountRepository, CreateFacebookAccountRepository } from '@/da
 
 export class FacebookauthenticationService {
   constructor (
-    private readonly loadFacebookUser: LoadFacebookUser,
-    private readonly loadUserAccountRepository: LoadUserAccountRepository,
-    private readonly createFacebookAccountRepository: CreateFacebookAccountRepository
+    private readonly facebookApi: LoadFacebookUser,
+    private readonly userAccountRepository: LoadUserAccountRepository & CreateFacebookAccountRepository
   ) {}
 
   async perform (
     params: FacebookAuthentication.Params
   ): Promise<AuthenticationError> {
-    const fbData = await this.loadFacebookUser.loadUser(params)
+    const fbData = await this.facebookApi.loadUser(params)
     if (fbData !== undefined) {
-      await this.loadUserAccountRepository.load({ email: fbData.email })
-      await this.createFacebookAccountRepository.createFromFacebook(fbData)
+      await this.userAccountRepository.load({ email: fbData.email })
+      await this.userAccountRepository.createFromFacebook(fbData)
     }
     return new AuthenticationError()
   }
