@@ -31,14 +31,16 @@ interface HttpGetClient {
 }
 
 describe('FacebookAPI', () => {
-  const clientId = 'any_client_id'
-  const clientSecret = 'any_client_secret'
+  let clientId: string
+  let clientSecret: string
 
   let sut: FaceBookApi
   let httpClient: MockProxy<HttpGetClient>
 
   beforeAll(() => {
     httpClient = mock()
+    clientId = 'any_client_id'
+    clientSecret = 'any_client_secret'
   })
 
   beforeEach(() => {
