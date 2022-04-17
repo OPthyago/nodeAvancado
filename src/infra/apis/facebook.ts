@@ -16,12 +16,20 @@ export class FaceBookApi {
         grant_type: 'client_credentials'
       }
     })
-    await this.httpClient.get({
+    const debugToken = await this.httpClient.get({
       url: `${this.baseUrl}/oauth/debug_token`,
       params: {
         access_token: appToken.access_token,
         input_token: params.token,
         grant_type: 'client_credentials'
+      }
+    })
+    await this.httpClient.get({
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      url: `${this.baseUrl}/${debugToken.data.user_id}`,
+      params: {
+        fields: ['id', 'name', 'email'].join(','),
+        access_token: params.token
       }
     })
   }
