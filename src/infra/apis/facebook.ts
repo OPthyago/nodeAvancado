@@ -1,6 +1,22 @@
 import { HttpGetClient } from '@/infra/http'
 import { LoadFacebookUser } from '@/data/contracts/apis'
 
+type AppToken ={
+  access_token: string
+}
+
+type DebugToken ={
+  data: {
+    user_id: string
+  }
+}
+
+type UserInfo ={
+  id: string
+  name: string
+  email: string
+}
+
 export class FaceBookApi implements LoadFacebookUser {
   private readonly baseUrl: string = 'https://graph.facebook.com'
 
@@ -8,7 +24,39 @@ export class FaceBookApi implements LoadFacebookUser {
   }
 
   async loadUser (params: LoadFacebookUser.Params): Promise<LoadFacebookUser.Result> {
-    const appToken = await this.httpClient.get({
+    const fbUserInfo = await this.getFbUserInfo(params.token)
+    return {
+      email: fbUserInfo.email,
+      facebookId: fbUserInfo.id,
+      name: fbUserInfo.name
+    }
+  }
+
+  private async getFbUserInfo (clientToken: string): Promise<UserInfo> {
+    const debugToken = await this.getDebugToken(clientToken)
+    return this.httpClient.get({
+      url: `${this.baseUrl}/${debugToken.data.user_id}`,
+      params: {
+        fields: ['id', 'name', 'email'].join(','),
+        access_token: clientToken
+      }
+    })
+  }
+
+  private async getDebugToken (clientToken: string): Promise<DebugToken> {
+    const appToken = await this.getAppToken()
+    return this.httpClient.get({
+      url: `${this.baseUrl}/oauth/debug_token`,
+      params: {
+        access_token: appToken.access_token,
+        input_token: clientToken,
+        grant_type: 'client_credentials'
+      }
+    })
+  }
+
+  private async getAppToken (): Promise<AppToken> {
+    return this.httpClient.get({
       url: `${this.baseUrl}/oauth/access_token`,
       params: {
         client_id: this.clientId,
@@ -16,27 +64,5 @@ export class FaceBookApi implements LoadFacebookUser {
         grant_type: 'client_credentials'
       }
     })
-    const debugToken = await this.httpClient.get({
-      url: `${this.baseUrl}/oauth/debug_token`,
-      params: {
-        access_token: appToken.access_token,
-        input_token: params.token,
-        grant_type: 'client_credentials'
-      }
-    })
-    const fbUserInfo = await this.httpClient.get({
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      url: `${this.baseUrl}/${debugToken.data.user_id}`,
-      params: {
-        fields: ['id', 'name', 'email'].join(','),
-        access_token: params.token
-      }
-    })
-
-    return {
-      email: fbUserInfo.email,
-      facebookId: fbUserInfo.id,
-      name: fbUserInfo.name
-    }
   }
 }
