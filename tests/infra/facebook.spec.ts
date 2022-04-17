@@ -17,6 +17,9 @@ describe('FacebookAPI', () => {
   })
 
   beforeEach(() => {
+    httpClient.get.mockResolvedValueOnce({
+      access_token: 'any_app_token'
+    })
     sut = new FaceBookApi(httpClient, clientId, clientSecret)
   })
 
@@ -31,6 +34,18 @@ describe('FacebookAPI', () => {
         grant_type: 'client_credentials'
       }
     })
-    expect(httpClient.get).toBeCalledTimes(1)
+  })
+
+  it('hound get debug token', async () => {
+    await sut.loadUser({ token: 'any_client_token' })
+
+    expect(httpClient.get).toHaveBeenCalledWith({
+      url: 'https://graph.facebook.com/oauth/debug_token',
+      params: {
+        access_token: 'any_app_token',
+        input_token: 'any_client_token',
+        grant_type: 'client_credentials'
+      }
+    })
   })
 })
