@@ -1,12 +1,12 @@
 import { TokenGenerator } from './../../../src/data/contracts/crypto/token'
 import jwt from 'jsonwebtoken'
 
-class JwtTokenGenerator {
+class JwtTokenGenerator implements TokenGenerator {
   constructor (private readonly secretKey: string) {}
 
-  async generateToken (params: TokenGenerator.Params): Promise<void> {
+  async generateToken (params: TokenGenerator.Params): Promise<TokenGenerator.Result> {
     const expirationInSeconds = params.expirationInMs / 1000
-    jwt.sign({ key: params.key }, this.secretKey, { expiresIn: expirationInSeconds })
+    return jwt.sign({ key: params.key }, this.secretKey, { expiresIn: expirationInSeconds })
   }
 }
 
@@ -18,6 +18,7 @@ describe('JwtTokenGenerator', () => {
 
   beforeAll(() => {
     fakeJwt = jwt as jest.Mocked<typeof jwt>
+    fakeJwt.sign.mockImplementation(() => 'any_token')
   })
 
   beforeEach(() => {
@@ -32,5 +33,14 @@ describe('JwtTokenGenerator', () => {
 
     expect(fakeJwt.sign).toHaveBeenCalledWith({ key: 'any_key' }, 'any_secret', { expiresIn: 1 })
     expect(fakeJwt.sign).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return a token', async () => {
+    const token = await sut.generateToken({
+      key: 'any_key',
+      expirationInMs: 1000
+    })
+
+    expect(token).toBe('any_token')
   })
 })
