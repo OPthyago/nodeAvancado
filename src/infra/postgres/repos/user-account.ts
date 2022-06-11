@@ -23,7 +23,6 @@ export class PgUserAccountRepository implements LoadUserAccountRepository, SaveF
       id = pgUser.id.toString()
     }
 
-
     return { id }
   }
 
